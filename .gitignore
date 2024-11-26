@@ -1,0 +1,35 @@
+# Ignore the binary output
+/bin/
+/obj/
+
+# Ignore Go workspace file
+go.work
+go.work.sum
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore dependency directories
+/vendor/
+
+# Ignore test coverage output
+*.out
+*.cover
+
+# Ignore Go build artifacts
+*.a
+*.so
+*.exe
+*.test
+
+# Ignore temporary and backup files
+*~
+*.swp
+*.bak
+
+# Ignore Go module cache
+/pkg/
+
+# Ignore testing downloads folder
+/downloads/
