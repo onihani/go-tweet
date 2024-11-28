@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type Tweet struct {
@@ -167,6 +168,15 @@ func (t *Tweet) GetAllMedia() []string {
 }
 
 func (v *VideoVariant) Download(destinationDir string) (string, error) {
+	// Expand `~` to the user's home directory
+	if strings.HasPrefix(destinationDir, "~/") {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get user home directory: %w", err)
+		}
+		destinationDir = filepath.Join(homeDir, destinationDir[2:])
+	}
+
 	// Ensure the directory exists or create it
 	if err := os.MkdirAll(destinationDir, os.ModePerm); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
@@ -196,8 +206,7 @@ func (v *VideoVariant) Download(destinationDir string) (string, error) {
 	defer file.Close()
 
 	// Write the response body to the file
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
+	if _, err := io.Copy(file, resp.Body); err != nil {
 		return "", fmt.Errorf("failed to save video: %w", err)
 	}
 

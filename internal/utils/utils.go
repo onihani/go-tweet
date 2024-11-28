@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -33,4 +35,18 @@ func ExtractTweetID(url string) (string, error) {
 
 	// If no match found, return an error
 	return "", fmt.Errorf("invalid tweet URL")
+}
+
+func IsValidTwitterUrl(str string) error {
+	u, err := url.ParseRequestURI(str)
+	if err != nil {
+		return errors.New("please enter a valid url")
+	}
+
+	hostname := strings.TrimPrefix(u.Hostname(), "www.")
+	if hostname != "x.com" {
+		return errors.New("enter a valid twitter url")
+	}
+
+	return nil
 }
