@@ -50,3 +50,15 @@ func IsValidTwitterUrl(str string) error {
 
 	return nil
 }
+
+func SanitizeTitle(title string) string {
+	// Replace non-alphanumeric characters with an underscore
+	re := regexp.MustCompile(`[^\w]+`)
+	sanitized := re.ReplaceAllString(title, "_")
+
+	// Truncate to 15 characters if necessary
+	if len(sanitized) > 15 {
+		sanitized = sanitized[:15]
+	}
+	return sanitized
+}

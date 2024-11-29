@@ -20,12 +20,12 @@ A simple Go application for downloading video content from Twitter. This project
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/twitter-video-downloader.git
+   git clone https://github.com/onihani/go-tweet.git
    ```
 
 2. Change into the project directory:
    ```bash
-   cd twitter-video-downloader
+   cd go-tweet
    ```
 
 3. Install dependencies:
@@ -40,7 +40,7 @@ A simple Go application for downloading video content from Twitter. This project
 
 5. Run the application:
    ```bash
-   ./twitter-video-downloader
+   ./go-tweet
    ```
 
 ## Usage
@@ -67,11 +67,7 @@ Download complete!
 - `tweet/tweet.go`: Defines the `Tweet` struct and methods to extract video URLs.
 - `util/util.go`: Utility functions like extracting the tweet ID from the URL.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 
 - [huh](https://github.com/charmbracelet/huh): Simple library for building terminal forms.
-- Twitter API (v2) for tweet data extraction.
