@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
+
+	"github.com/onihani/go-tweet/internal/utils"
 )
 
 type Tweet struct {
@@ -167,7 +170,7 @@ func (t *Tweet) GetAllMedia() []string {
 	return mediaURLs
 }
 
-func (v *VideoVariant) Download(destinationDir string) (string, error) {
+func (v *VideoVariant) Download(destinationDir string, title string) (string, error) {
 	// Expand `~` to the user's home directory
 	if strings.HasPrefix(destinationDir, "~/") {
 		homeDir, err := os.UserHomeDir()
@@ -183,7 +186,7 @@ func (v *VideoVariant) Download(destinationDir string) (string, error) {
 	}
 
 	// Create a file name based on bitrate and aspect ratio
-	fileName := fmt.Sprintf("video_%dkbps.mp4", v.Bitrate/1000)
+	fileName := fmt.Sprintf("%s_%dkbp_%d.mp4", utils.SanitizeTitle(title), v.Bitrate/1000, time.Now().UnixMilli())
 	filePath := filepath.Join(destinationDir, fileName)
 
 	// Open the URL

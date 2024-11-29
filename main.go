@@ -78,7 +78,7 @@ func main() {
 		Title(fmt.Sprintf("Downloading video at %s to %s...", selectedResolution, downloadDirectory)).
 		Accessible(false).
 		Action(func() {
-			dfPath, err := selectedVideo.Download(downloadDirectory)
+			dfPath, err := selectedVideo.Download(downloadDirectory, tweet.Text)
 			if err != nil {
 				panic(err)
 			}
