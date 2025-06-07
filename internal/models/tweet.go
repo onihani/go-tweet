@@ -11,7 +11,25 @@ import (
 	"time"
 
 	"github.com/onihani/go-tweet/internal/utils"
+	"github.com/schollz/progressbar/v3"
 )
+
+// ProgressReader wraps an io.Reader to track progress
+type ProgressReader struct {
+	Reader     io.Reader
+	Total      int64
+	Downloaded int64
+	Bar        *progressbar.ProgressBar
+}
+
+func (pr *ProgressReader) Read(p []byte) (n int, err error) {
+	n, err = pr.Reader.Read(p)
+	pr.Downloaded += int64(n)
+	if pr.Bar != nil {
+		pr.Bar.Add(n)
+	}
+	return
+}
 
 type Tweet struct {
 	TypeName          string         `json:"__typename"`
@@ -185,7 +203,7 @@ func (v *VideoVariant) Download(destinationDir string, title string) (string, er
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// Create a file name based on bitrate and aspect ratio
+	// Create a file name based on bitrate and timestamp
 	fileName := fmt.Sprintf("%s_%dkbp_%d.mp4", utils.SanitizeTitle(title), v.Bitrate/1000, time.Now().UnixMilli())
 	filePath := filepath.Join(destinationDir, fileName)
 
@@ -208,10 +226,36 @@ func (v *VideoVariant) Download(destinationDir string, title string) (string, er
 	}
 	defer file.Close()
 
-	// Write the response body to the file
-	if _, err := io.Copy(file, resp.Body); err != nil {
+	// Create progress bar
+	bar := progressbar.NewOptions64(
+		resp.ContentLength,
+		progressbar.OptionSetDescription(fmt.Sprintf("Downloading video at %dkbp to %s", v.Bitrate/1000, destinationDir)),
+		progressbar.OptionSetWidth(30),
+		progressbar.OptionShowBytes(true),
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}),
+	)
+
+	// Wrap response body with progress reader
+	pr := &ProgressReader{
+		Reader: resp.Body,
+		Total:  resp.ContentLength,
+		Bar:    bar,
+	}
+
+	// Write the response body to the file with progress tracking
+	if _, err := io.Copy(file, pr); err != nil {
 		return "", fmt.Errorf("failed to save video: %w", err)
 	}
+
+	// Ensure the progress bar completes
+	bar.Finish()
 
 	return filePath, nil
 }

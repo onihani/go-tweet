@@ -67,25 +67,13 @@ func main() {
 
 	selectedVideo := tweetVideos[selectedResolution]
 
-	downloadDirectory, err := form.CollectStringInput("Enter path to the directory you want to download video to")
+	downloadDirectory, err := form.GetDirectoryPath("Enter path to the directory you want to download video to", true)
 	if err != nil {
 		fmt.Println("Error collecting download directory:", err)
 		return
 	}
 
-	var downloadedFilePath string
-	err = spinner.New().
-		Title(fmt.Sprintf("Downloading video at %s to %s...", selectedResolution, downloadDirectory)).
-		Accessible(false).
-		Action(func() {
-			dfPath, err := selectedVideo.Download(downloadDirectory, tweet.Text)
-			if err != nil {
-				panic(err)
-			}
-
-			downloadedFilePath = dfPath
-		}).Run()
-
+	downloadedFilePath, err := selectedVideo.Download(downloadDirectory, tweet.Text)
 	if err != nil {
 		fmt.Println("Failed to download video", err)
 		return

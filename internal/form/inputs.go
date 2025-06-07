@@ -2,6 +2,7 @@ package form
 
 import (
 	"log"
+	"os"
 
 	"github.com/charmbracelet/huh"
 	"github.com/onihani/go-tweet/internal/utils"
@@ -48,6 +49,57 @@ func CollectTweetUrl() (string, error) {
 	}
 
 	return tweetUrl, nil
+}
+
+func GetDirectoryPath(label string, isDirectory bool) (string, error) {
+	var input string
+
+	if isDirectory {
+		// Initialize file picker for directory selection
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			log.Printf("Failed to get home directory: %v", err)
+			homeDir = "."
+		}
+
+		filePicker := huh.NewFilePicker().
+			Title(label).
+			DirAllowed(true).
+			FileAllowed(false).
+			CurrentDirectory(homeDir).
+			ShowHidden(true).
+			// Height(30).
+			Value(&input)
+
+		// Initialize the form with file picker
+		form := huh.NewForm(
+			huh.NewGroup(filePicker),
+		)
+
+		// Run the form
+		err = form.Run()
+		if err != nil {
+			log.Fatalf("Failed to get directory input: %v", err)
+			return "", err
+		}
+	} else {
+		// Original input field for non-directory inputs
+		form := huh.NewForm(
+			huh.NewGroup(
+				huh.NewInput().Title(label).Value(&input),
+			),
+		)
+
+		// Run the form
+		err := form.Run()
+		if err != nil {
+			log.Fatalf("Failed to get input: %v", err)
+			return "", err
+		}
+	}
+
+	// Return the selected input or directory path
+	return input, nil
 }
 
 func SelectResolution(resolutions []string) (string, error) {

@@ -33,3 +33,6 @@ go.work.sum
 
 # Ignore testing downloads folder
 /downloads/
+
+# Binaries
+go-tweet
